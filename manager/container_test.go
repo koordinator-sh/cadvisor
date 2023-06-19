@@ -31,12 +31,9 @@ import (
 	itest "github.com/google/cadvisor/info/v1/test"
 	v2 "github.com/google/cadvisor/info/v2"
 
-	"github.com/mindprince/gonvml"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	clock "k8s.io/utils/clock/testing"
-
-	"github.com/google/cadvisor/accelerators"
 )
 
 const (
@@ -214,24 +211,24 @@ func TestGetInfo(t *testing.T) {
 	}
 }
 
-func TestUpdateNvidiaStats(t *testing.T) {
-	cd, _, _, _ := newTestContainerData(t)
-	stats := info.ContainerStats{}
-
-	// When there are no devices, we should not get an error and stats should not change.
-	cd.nvidiaCollector = accelerators.NewNvidiaCollector([]gonvml.Device{})
-	err := cd.nvidiaCollector.UpdateStats(&stats)
-	assert.Nil(t, err)
-	assert.Equal(t, info.ContainerStats{}, stats)
-
-	// This is an impossible situation (there are devices but nvml is not initialized).
-	// Here I am testing that the CGo gonvml library doesn't panic when passed bad
-	// input and instead returns an error.
-	cd.nvidiaCollector = accelerators.NewNvidiaCollector([]gonvml.Device{{}, {}})
-	err = cd.nvidiaCollector.UpdateStats(&stats)
-	assert.NotNil(t, err)
-	assert.Equal(t, info.ContainerStats{}, stats)
-}
+//func TestUpdateNvidiaStats(t *testing.T) {
+//	cd, _, _, _ := newTestContainerData(t)
+//	stats := info.ContainerStats{}
+//
+//	// When there are no devices, we should not get an error and stats should not change.
+//	cd.nvidiaCollector = accelerators.NewNvidiaCollector([]gonvml.Device{})
+//	err := cd.nvidiaCollector.UpdateStats(&stats)
+//	assert.Nil(t, err)
+//	assert.Equal(t, info.ContainerStats{}, stats)
+//
+//	// This is an impossible situation (there are devices but nvml is not initialized).
+//	// Here I am testing that the CGo gonvml library doesn't panic when passed bad
+//	// input and instead returns an error.
+//	cd.nvidiaCollector = accelerators.NewNvidiaCollector([]gonvml.Device{{}, {}})
+//	err = cd.nvidiaCollector.UpdateStats(&stats)
+//	assert.NotNil(t, err)
+//	assert.Equal(t, info.ContainerStats{}, stats)
+//}
 
 func TestOnDemandHousekeeping(t *testing.T) {
 	statsList := itest.GenerateRandomStats(1, 4, 1*time.Second)
